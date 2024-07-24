@@ -8,6 +8,7 @@ sudo apt install -y \
     apt-transport-https \
     ca-certificates \
     curl \
+    git \
     gnupg \
     lsb-release
 
@@ -26,6 +27,15 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io
 
 # Add current user to the docker group to run docker commands without sudo (optional)
 sudo usermod -aG docker $USER
+
+# Start Docker service
+sudo service docker start
+
+# Enable service to start on boot
+sudo systemctl enable docker
+
+# Verify that Docker is running
+sudo systemctl status docker
 
 # Install Docker Compose
 sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
