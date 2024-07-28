@@ -2,15 +2,7 @@
 
 # Update packages
 sudo apt update -y
-
-# Install dependencies to allow apt to use a repository over HTTPS
-sudo apt install -y \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    git \
-    gnupg \
-    lsb-release
+sudo apt upgrade -y
 
 # Add Docker’s official GPG key
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
