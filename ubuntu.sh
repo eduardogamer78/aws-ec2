@@ -1,38 +1,52 @@
 #!/bin/bash
 
-# Update packages
-sudo apt update -y
-sudo apt upgrade -y
+# Update and upgrade the system
+echo "Updating system..."
+sudo apt-get update -y
+sudo apt-get upgrade -y
 
-# Add Docker’s official GPG key
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+# Install prerequisites
+echo "Installing prerequisites..."
+sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 
-# Set up stable repository
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+# Add Docker's official GPG key
+echo "Adding Docker's GPG key..."
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
-# Update packages again (to get access to Docker repository)
-sudo apt update -y
+# Set up the Docker repository
+echo "Setting up Docker repository..."
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
 # Install Docker
-sudo apt install -y docker-ce docker-ce-cli containerd.io
+echo "Installing Docker..."
+sudo apt-get update -y
+sudo apt-get install -y docker-ce
 
-# Add current user to the docker group to run docker commands without sudo (optional)
-sudo usermod -aG docker $USER
-
-# Start Docker service
-sudo service docker start
-
-# Enable service to start on boot
+# Start Docker and enable it to start at boot
+echo "Starting Docker..."
+sudo systemctl start docker
 sudo systemctl enable docker
 
-# Verify that Docker is running
-sudo systemctl status docker
+# Add the current user to the Docker group (optional)
+echo "Adding user to Docker group..."
+sudo usermod -aG docker $USER
+
+# Verify Docker installation
+echo "Verifying Docker installation..."
+docker --version
 
 # Install Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+echo "Installing Docker Compose..."
+DOCKER_COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep 'tag_name' | cut -d '"' -f 4)
+sudo curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+# Set executable permissions for Docker Compose binary
+echo "Setting executable permissions for Docker Compose..."
 sudo chmod +x /usr/local/bin/docker-compose
 
-# Verify Docker and Docker Compose installation
-docker --version
+# Verify Docker Compose installation
+echo "Verifying Docker Compose installation..."
 docker-compose --version
+
+# Final message
+echo "Docker and Docker Compose installation complete!"
